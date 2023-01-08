@@ -12,8 +12,14 @@
     "postuninstall": "electron-builder install-app-deps"
   },
   "main": "background.js",
+  "renderer": "renderer/render.js",
   "dependencies": {
     "core-js": "^3.8.3",
+    "crypto-browserify": "^3.12.0",
+    "mqtt": "^4.3.7",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "promise-mysql": "^5.2.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
   },
