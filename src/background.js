@@ -2,7 +2,7 @@
 import path from 'path'
 import { app, protocol, BrowserWindow, ipcMain} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+// import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 
@@ -12,12 +12,31 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+
+let loginWindow;
+let mainWindow;
+async function createLoginWindow(){
+  loginWindow = new BrowserWindow({
+    width: 400,
+    height: 650,
+    resizable: false
+
+  });
+  // Load the index.html when not in development
+  loginWindow.loadURL(`file://${__dirname}/../src/login/index.html`);
+  loginWindow.webContents.openDevTools()
+  loginWindow.setMenuBarVisibility(false)
+  loginWindow.on('closed', ()=>{
+      loginWindow = null
+  })
+}
 async function createWindow () {
   // Create the browser window.
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 920,
     height: 650,
     resizable: false,
+    show: false,
     webPreferences: {
 
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -25,25 +44,25 @@ async function createWindow () {
       nodeIntegration :true,
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
-            
+
     }
   })
-  win.setMenuBarVisibility(false)
-  win.on('page-title-updated', function (e) {
+  mainWindow.setMenuBarVisibility(false)
+  mainWindow.on('page-title-updated', function (e) {
     e.preventDefault()
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
+//     // Load the url of the dev server if in development mode
+    await mainWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+    if (!process.env.IS_TEST) mainWindow.webContents.openDevTools()
   } else {
     createProtocol('app')
-    // Load the index.html when not in development
-    win.loadURL('app://./index.html')
+//     // Load the index.html when not in development
+    mainWindow.loadURL('app://./index.html')
   }
 }
-
+//
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -52,16 +71,17 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  if (BrowserWindow.getAllWindows().length === 0)
+    createLoginWindow()
+    createWindow()
 })
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+//
+// // This method will be called when Electron has finished
+// // initialization and is ready to create browser windows.
+// // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   // if (isDevelopment && !process.env.IS_TEST) {
   //   // Install Vue Devtools
@@ -71,7 +91,12 @@ app.on('ready', async () => {
   //     console.error('Vue Devtools failed to install:', e.toString())
   //   }
   // }
-  createWindow()
+  createLoginWindow();
+  loginWindow.on('closed', ()=>{
+    createWindow()
+    mainWindow.show();
+  })
+
 })
 
 // Exit cleanly on request from parent process in development mode.
