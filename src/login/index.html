@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <title>Africa-Talk</title>
+</head>
+<body>
+      <div class="iconTitle" style="color:#FFFFFF; text-align: center">
+            Africa-Talk
+      </div>
+      <div class="entranceState">
+          <div id="loginState" onclick="showHideLogin()">Login</div>
+          <div class="middle" style="margin-top: -0.2vw";>|</div>
+          <div id="registerState" onclick="showHideRegister()">Register</div>
+      </div>
+      <div id="loginPage"  >
+          <div class="Login" >
+              <div class="username">
+                  <input type="text" placeholder="username" id="loginUsernameInput" required>
+              </div>
+              <div class="password">
+                  <input type="password" name="" id="loginPasswordInput" placeholder="password" required>
+              </div>
+              <div class="submit">
+                  <button type="submit" onclick="loginFunc()">Login</button>
+              </div>
+          </div>
+      </div>
+      <div id="registerPage">
+          <div class="register">
+              <div class="phone">
+                  <input type="tel" placeholder="phone" id="phoneRegisterInput" required>
+              </div>
+              <div class="username">
+                  <input type="text" placeholder="username" id="usernameRegisterInput" required>
+              </div>
+              <div class="password">
+                  <input type="password" name="" id="passwordRegisterInput" placeholder="password" required>
+              </div>
+              <div class="password">
+                  <input type="password" name="" id="confirmRegisterInput" placeholder="confirm password" required>
+              </div>
+              <div class="registerBtn">
+                  <button type="submit" >Register</button>
+              </div>
+          </div>
+      </div>
+      <script  src="./js/index.js"></script>
+</body>
+</html>
