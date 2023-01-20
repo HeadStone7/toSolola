@@ -89,7 +89,7 @@ export default {
         beforeMount(){
 
         },
-        mounted() {
+    mounted() {
             // console.log("updated"+ this.activeUser(true))
             const api = new ApiCall();
             api.checkCredential("Josh", "12345")
