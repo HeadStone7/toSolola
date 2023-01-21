@@ -18,7 +18,7 @@ const registerTitleBtn = document.getElementById("registerState")
 //         let usernameLogin = document.getElementById("loginUsernameInput").value;
 //         let passwordLogin = document.getElementById("loginPasswordInput").value;
 //
-//         api.checkCredentials(usernameLogin, passwordLogin)
+//         api.checkCredential(usernameLogin, passwordLogin)
 //             .then(r => console.log("cool"+r))
 //         console.log(usernameLogin + " " + passwordLogin)
 //     },
@@ -37,7 +37,14 @@ function showHideRegister(){
     loginTitleBtn.style.backgroundColor = "#227bb0";
     registerTitleBtn.style.backgroundColor = "#0e374f85";
 }
-//
-// function loginFunction(){
-//
-// }
+
+function loginFunc(){
+    const api = require('@/ApiCall');
+
+        let usernameLogin = document.getElementById("loginUsernameInput").value;
+        let passwordLogin = document.getElementById("loginPasswordInput").value;
+
+        api.checkCredential(usernameLogin, passwordLogin)
+            .then(r => console.log("cool"+r))
+        console.log(usernameLogin + " " + passwordLogin)
+}
