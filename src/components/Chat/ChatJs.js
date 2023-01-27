@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import {ApiCall} from '@/ApiCall';
 
 export default {
@@ -91,10 +92,10 @@ export default {
         },
     mounted() {
             // console.log("updated"+ this.activeUser(true))
-            const api = new ApiCall();
-            api.checkCredential("Josh", "12345")
-                .then()
-                .catch()
+            // const api = new ApiCall();
+            // api.checkCredential("Josh", "12345")
+            //     .then()
+            //     .catch()
     },
     methods:{
       getUserId(index){
