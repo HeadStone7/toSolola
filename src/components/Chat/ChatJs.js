@@ -91,6 +91,10 @@ export default {
 
         },
     mounted() {
+        console.log('id = '+this.$store.state.user.userId)
+        console.log('phone = '+this.$store.state.user.phone)
+        console.log('username '+this.$store.state.user.username)
+        console.log('picture '+this.$store.state.user.picture)
             // console.log("updated"+ this.activeUser(true))
             // const api = new ApiCall();
             // api.checkCredential("Josh", "12345")
