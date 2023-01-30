@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import store from "./store";
 export class ApiCall {
 
     async getUsers(){
@@ -16,32 +16,23 @@ export class ApiCall {
 
         return resp.data
     }
-
-    async getContacts(){
-        let resp = await axios
-            .get('http://localhost:8080/contacts')
-            .catch(err => console.log("Error: ",err));
-
-        console.log(resp.data)
-
-        return resp.data
-    }
     // eslint-disable-next-lin
-    async checkCredential(username, password) {
-        if (username === '' || password === '') {
+    async checkCredential(phone, password) {
+        if (!phone || !password) {
             return
         } else {
             let found = false
             let resp = await axios
-                .get('http://localhost:8080/test')
+                .get('http://localhost:8080/tosolola/api/contact')
                 .catch(err => console.log("Error: ", err));
 
             for (let index in resp.data) {
-                if (resp.data[index].username === username && resp.data[index].pwd === password) {
-                    console.log(username + " Connected")
+                if (resp.data[index].phone === phone && resp.data[index].pwd === password) {
+                    console.log(resp.data[index].username + " Connected")
+                    store.commit('updateUser', resp.data[index])
                     found = true
                 } else {
-                    console.log(username+" Credential error")
+                    console.log(resp.data[index].username+" Credential error")
 
                 }
             }
@@ -49,23 +40,27 @@ export class ApiCall {
             return found
         }
 
-        // if(username === '' || password === ''){
-        //     return;
-        // }else {
-        //     await axios
-        //         .get('http://localhost:8080/test')
-        //         .then(response =>{
-        //             for(let i = 0; i < response.data.length; i++){
-        //                 if(response.data[i].username === username && response.data[i].pwd === password){
-        //                     console.log(username+" connected");
-        //                     return true
-        //                 }
-        //             }
-        //             return false
-        //         })
-        //         .catch(err =>{
-        //             console.log('Error: '+err)
-        //         })
-        // }
+    }
+
+    async register(username, password, phone) {
+        if (!phone || !username || !password) {
+            console.log('fields empty')
+            return
+        } else {
+            let found = false
+            await axios.post('http://localhost:8080/tosolola/api/register', {
+                username: username,
+                pwd: password,
+                phone: phone
+            })
+                .then(isValid => {
+                    console.log('is valid =' + isValid.data)
+                    found = !!isValid.data;
+                })
+                .catch(error => {
+                    console.error(error)
+                })
+            return found
+        }
     }
 }
