@@ -35,7 +35,51 @@ body{
         color: $titleClr;
         align-content: center;
       }
+      .no-select{
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .loading-dots{
+        position: absolute;
+        top: 22%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
 
+        .dot{
+          background: #f1f0f0;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          margin: 0 8px;
+          animation: loading-dots 1s ease-in-out infinite;
+        }
+        .dot:nth-child(1){
+          animation-delay: 0.2s;
+        }
+        .dot:nth-child(2){
+          animation-delay: 0.4s;
+        }
+      }
+      @keyframes loading-dots {
+        0%{
+          transform: scale(1);
+        }
+        20%{
+          transform: scale(1.5);
+        }
+        100%{
+          transform: scale(1);
+        }
+      }
       .entranceState {
         margin: 0 auto;
         color: $titleClr;
@@ -54,7 +98,7 @@ body{
           font-size: $standardFontSize;
           cursor: pointer;
           width: 92px;
-          height: 30px
+          height: 30px;
         }
         .middle{
 
@@ -90,7 +134,7 @@ body{
           margin-bottom: 30px;
         }
 
-        .username input[type=text], .password input[type=password], .phone input[type=tel] {
+        .username input[type=tel], .password input[type=password], .phone input[type=tel] {
           font-size: $standardFontSize;
           height: 35px;
           width: 320px;
@@ -124,7 +168,7 @@ body{
       }
       #registerPage {
         margin-top: 40px;
-        display: none;
+        display: flex;
         justify-content: center;
         align-items: start;
         width: 70%;
