@@ -1,5 +1,4 @@
 // eslint-disable-next-line
-import {ApiCall} from '@/ApiCall';
 
 export default {
     components:{
@@ -93,8 +92,10 @@ export default {
     mounted() {
         console.log('id = '+this.$store.state.user.userId)
         console.log('phone = '+this.$store.state.user.phone)
-        console.log('username '+this.$store.state.user.username)
-        console.log('picture '+this.$store.state.user.picture)
+        console.log('username = '+this.$store.state.user.username)
+        console.log('picture = '+this.$store.state.user.picture)
+        console.log('city = '+this.$store.state.user.city)
+
             // console.log("updated"+ this.activeUser(true))
             // const api = new ApiCall();
             // api.checkCredential("Josh", "12345")
@@ -113,7 +114,6 @@ export default {
             // Get the chat messages container element
             var messagesContainer = document.getElementById("messages-box")
             // messageBox.innerHTML +=textarea+"<br>"
-
 
             // Create a new div element for the received message
             var receivedMessageDiv = document.createElement("div");
@@ -149,7 +149,7 @@ export default {
             // Append the message text to the sent
             sentMessageDiv.appendChild(sentMessageText)
             messagesContainer.appendChild(sentMessageDiv)
-                    }
+        }
         document.getElementById("text-box").value = ""
 
 
