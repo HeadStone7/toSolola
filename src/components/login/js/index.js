@@ -16,6 +16,9 @@ export default {
         }
     },
     watch:{
+        showLoading(newVal, oldVal){
+            oldVal = this.$store.state.networkStatus.state
+        }
     },
     beforeMount() {
         this.api = new ApiCall()
@@ -42,7 +45,7 @@ export default {
         async loginFunc() {
             let loginPhone = document.getElementById("loginPhoneInput").value;
             let passwordLogin = document.getElementById("loginPasswordInput").value;
-            this.showLoading = true
+            this.$store.commit('networkUpdate',true)
 
             console.log("loginFunc running ")
             setTimeout(async () => {
@@ -56,7 +59,7 @@ export default {
                             this.$emit('loginState', false)
                         }
                     })
-                this.showLoading = false
+                this.$store.commit('networkUpdate',false)
             }, 7000)
         },
         async registerFunc() {
@@ -64,7 +67,7 @@ export default {
             let registerUsernameInput = document.getElementById("usernameRegisterInput").value
             let registerPassword = document.getElementById("passwordRegisterInput").value
             let registerConfirmPwd = document.getElementById("confirmRegisterInput").value
-            this.showLoading = true
+            this.$store.commit('networkUpdate',true)
             setTimeout(async () => {
                 await this.api.checkCredential(registerUsernameInput, registerPassword)
                     .then(async isValid => {
@@ -92,7 +95,10 @@ export default {
                             }
                         }
                     })
-                this.showLoading = false
+
+                this.$store.commit('networkUpdate',false)
+
+
             }, 7000)
 
         }
