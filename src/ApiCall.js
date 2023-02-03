@@ -1,3 +1,4 @@
+/* eslint-disable */
 import axios from "axios";
 import store from "./store";
 export class ApiCall {
@@ -23,8 +24,11 @@ export class ApiCall {
         } else {
             let found = false
             let resp = await axios
-                .get('http://localhost:8080/tosolola/api/contact')
-                .catch(err => console.log("Error: ", err));
+                .get('http://localhost:8080/tosolola/api/users')
+                .catch(err => {
+                    store.commit('networkUpdate', false)
+                    console.log("Error: ", err)
+                });
 
             for (let index in resp.data) {
                 if (resp.data[index].phone === phone && resp.data[index].pwd === password) {
@@ -58,9 +62,35 @@ export class ApiCall {
                     found = !!isValid.data;
                 })
                 .catch(error => {
+                    store.commit('networkUpdate', false)
                     console.error(error)
                 })
             return found
         }
+    }
+
+
+    async postImageToDB(image, userId){
+        console.log(userId + ' I am not empty')
+        await axios.post('http://localhost:8080/tosolola/api/upload-profile?id='+userId, image)
+            .then(response => response.status)
+            .then(data =>{
+                console.log('Success', data)
+            })
+            .catch(error =>{
+                console.error('Error: '+error)
+            })
+        console.log('post image to db done')
+
+    }
+    async getImageFromAPI(userId){
+        let resp = await axios.get('http://localhost:8080/tosolola/api/get-profile-image?userId='+userId, { responseType: 'blob'})
+            .catch(error =>{
+                console.log('getImageFromAPI error: '+error)
+            })
+        let url = URL.createObjectURL(resp.data)
+
+        console.log('this image: '+ url)
+        return url
     }
 }
