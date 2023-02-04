@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import {createStore} from "vuex";
-import axios from "axios";
+// import axios from "axios";
 
 const store = createStore({
     state:{
@@ -14,6 +14,10 @@ const store = createStore({
         },
         networkStatus:{
             state: false
+        },
+        //showIcon image on btn when there's  no image to display
+        showIcon: {
+            state: false
         }
     },
     mutations:{
@@ -22,7 +26,6 @@ const store = createStore({
             state.user.username = payload.username
             state.user.phone = payload.phone
             state.user.city = payload.city
-
         },
         /**
          * listening to changes state of network to show/hide loagin/register
@@ -35,15 +38,18 @@ const store = createStore({
         },
         setProfileImage(state, imageData) {
             state.user.picture = imageData
-    }
-    },
-    actions:{
-        async fetchImage({commit}, userId){
-            const response = await axios.get(`http://localhost:8080/tosolola/api/get-profile-image?userId=${userId}`, {responseType: "blob"})
-            const imageData = new Uint8Array(response.data)
-            commit('setProfileImage', imageData)
+        },
+        setDefaultIcon(state, payload){
+            state.showIcon.state = payload
         }
-    }
+    },
+    // actions:{
+    //     async fetchImage({commit}, userId){
+    //         const response = await axios.get(`http://localhost:8080/tosolola/api/get-profile-image?userId=${userId}`, {responseType: "blob"})
+    //         const imageData = new Uint8Array(response.data)
+    //         commit('setProfileImage', imageData)
+    //     }
+    // }
 })
 
 export default store
