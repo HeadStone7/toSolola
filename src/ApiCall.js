@@ -1,6 +1,10 @@
 /* eslint-disable */
 import axios from "axios";
 import store from "./store";
+
+/**
+ * ApiCall class
+ */
 export class ApiCall {
 
     async getUsers(){
@@ -17,10 +21,17 @@ export class ApiCall {
 
         return resp.data
     }
-    // eslint-disable-next-lin
+
+    /**
+     * Function Checks credential when login
+     * also used to check before registering
+     * @param phone
+     * @param password
+     * @returns {Promise<boolean>}
+     */
     async checkCredential(phone, password) {
         if (!phone || !password) {
-            return
+            return false
         } else {
             let found = false
             let resp = await axios
@@ -46,11 +57,22 @@ export class ApiCall {
 
     }
 
-    async register(username, password, phone) {
-        if (!phone || !username || !password) {
+    /**
+     * Function add new user to the DB
+     * @param username
+     * @param password
+     * @param phone
+     * @returns {Promise<boolean>}
+     */
+    async register(username, password, confirmPassword, phone) {
+        if (!phone || !username || !password || !confirmPassword) {
             console.log('fields empty')
-            return
-        } else {
+            return false
+        }else if (password !== confirmPassword){
+            console.log('mot de passe non identique')
+        }else if(await this.checkCredential(phone, password)){
+            console.log('Account already registered')
+        } else{
             let found = false
             await axios.post('http://localhost:8080/tosolola/api/register', {
                 username: username,
@@ -69,7 +91,12 @@ export class ApiCall {
         }
     }
 
-
+    /**
+     *Function Posts Image and userId
+     * @param image
+     * @param userId
+     * @returns {Promise<void>}
+     */
     async postImageToDB(image, userId){
         console.log(userId + ' I am not empty')
         await axios.post('http://localhost:8080/tosolola/api/upload-profile?id='+userId, image)
@@ -83,9 +110,17 @@ export class ApiCall {
         console.log('post image to db done')
 
     }
+
+    /**
+     * Function gets image from api sent by sendFile
+     * and creates a url of the received file and returns it
+     * @param userId
+     * @returns {Promise<string>}
+     */
     async getImageFromAPI(userId){
         let resp = await axios.get('http://localhost:8080/tosolola/api/get-profile-image?userId='+userId, { responseType: 'blob'})
             .catch(error =>{
+                store.commit('setDefaultIcon', true)
                 console.log('getImageFromAPI error: '+error)
             })
         let url = URL.createObjectURL(resp.data)
