@@ -69,36 +69,22 @@ export default {
             let registerConfirmPwd = document.getElementById("confirmRegisterInput").value
             this.$store.commit('networkUpdate',true)
             setTimeout(async () => {
-                await this.api.checkCredential(registerUsernameInput, registerPassword)
-                    .then(async isValid => {
-                        if (isValid) {
-                            console.log('Account already registered')
-                        } else {
-                            if (registerPassword !== registerConfirmPwd) {
-                                console.log('mot de passe non identique')
-                            } else {
-                                await this.api.register(registerUsernameInput, registerPassword, registerPhoneInput)
-                                    .then(isValid => {
-                                        console.log('in register isValid is = ' + isValid)
-                                        if (isValid) {
-                                            console.log('It\'s valide')
-                                            this.showHideLogin()
-                                        } else {
-                                            console.log('not valide')
 
-                                        }
-                                    })
-                                    .catch((err) => {
-                                        console.error(err);
-                                        return false
-                                    });
-                            }
+                await this.api.register(registerUsernameInput, registerPassword, registerConfirmPwd, registerPhoneInput)
+                    .then(isValid => {
+                        console.log('in register isValid is = ' + isValid)
+                        if (isValid) {
+                            console.log('It\'s valide')
+                            this.showHideLogin()
+                        } else {
+                            console.log('not valide')
                         }
                     })
-
+                    .catch((err) => {
+                        console.error(err);
+                        return false
+                    });
                 this.$store.commit('networkUpdate',false)
-
-
             }, 7000)
 
         }
