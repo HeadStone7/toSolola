@@ -22,6 +22,16 @@ export class ApiCall {
         return resp.data
     }
 
+    async getAllUsers(){
+        const response = await axios.get('http://localhost:8080/tosolola/api/users')
+            .catch(error =>{
+                console.log('getUsers Error: '+error)
+            })
+
+        // console.log(response.data)
+        return response.data
+    }
+
     /**
      * Function Checks credential when login
      * also used to check before registering
@@ -107,7 +117,6 @@ export class ApiCall {
             .catch(error =>{
                 console.error('Error: '+error)
             })
-        console.log('post image to db done')
 
     }
 
@@ -118,14 +127,66 @@ export class ApiCall {
      * @returns {Promise<string>}
      */
     async getImageFromAPI(userId){
-        let resp = await axios.get('http://localhost:8080/tosolola/api/get-profile-image?userId='+userId, { responseType: 'blob'})
-            .catch(error =>{
-                store.commit('setDefaultIcon', true)
-                console.log('getImageFromAPI error: '+error)
-            })
-        let url = URL.createObjectURL(resp.data)
+        try {
+            let resp = await axios.get('http://localhost:8080/tosolola/api/get-profile-image?userId='+userId, { responseType: 'blob'})
+                .catch(error =>{
+                    store.commit('setDefaultIcon', true)
+                    console.log('getImageFromAPI error: '+error)
+                })
+            let url = URL.createObjectURL(resp.data)
 
-        console.log('this image: '+ url)
-        return url
+            console.log('this image: '+ url)
+            return url;
+        }catch (e) {
+            console.log(`getImageFromAPI: `+e)
+        }
     }
+
+    /**
+     * Function is getting ids of friends with status of "Accepted"
+     * @param userId
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    async getAcceptedFriendsId(userId){
+        let response = await axios.get('http://localhost:8080/tosolola/api/accepted-friends-id?userId='+userId)
+            .catch(error =>{
+                console.log('getIds error: '+error)
+            })
+        return response;
+    }
+
+    /**
+     * Functions is getting any user data by Id
+     * @param userId
+     * @returns {Promise<*>}
+     */
+    async getUserById(userId){
+        let response = await axios.get('http://localhost:8080/tosolola/api/user-contacts-list?userId='+userId)
+            .catch(error =>{
+                console.log(`getUserById error: ${error}`)
+            })
+        // console.log(` getUserById: ${response}`)
+
+        return response.data;
+    }
+
+    /**
+     * Function get message from API by id
+     * @param userId
+     * @param friendId
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    async getMsgHistoryFromAPI(userId, friendId) {
+        try {
+            const response = await axios.get(
+                'http://localhost:8080/tosolola/api/msg-history?userId=' +
+                userId +'&friendId='+ friendId
+            );
+            // console.log(`this is getMsgHistory ${response.data[0].message_txt}`);
+            return response;
+        } catch (error) {
+            console.log(`getMsgHistoryFromAPI error: ${error}`);
+        }
+    }
+
 }
