@@ -11,6 +11,7 @@ export default {
           showSearchedUser: false,
           messageContainer: null,
           userObjectId: null,
+          imagePath: undefined,
           api: null,
           user: {
               picture: 'Pic',
@@ -56,29 +57,24 @@ export default {
 
                             this.api.getImageFromAPI(id.data[index].user_id)
                                 .then(path =>{
-                                    let user = {
-                                        picture: path,
-                                        name: users[0].username,
-                                        msg: 'demain je serai la lolo cool love purity',
-                                        date: '2020-04-12'
-                                    }
-                                    this.container.push(user)
+                                    console.log('this path: '+path)
+
+                                        let user = {
+                                            userId: users[0].user_id,
+                                            picture: path,
+                                            name: users[0].username,
+                                            msg: 'demain je serai la lolo cool love purity',
+
+                                        }
+                                        this.container.push(user)
+
+                                        console.log('it\'s alright')
+
                                 })
 
                         })
                     // console.log(`userId = '${this.$store.state.user.userId} and friendId = '${id.data[index].user_id}' `)
-                    this.api.getMsgHistoryFromAPI(this.userObjectId, id.data[index].user_id)
-                        .then(response =>{
-                            for(let index in response.data){
-                                // console.log(`msg from data: ${response.data[index].message_txt}`)
-                                if (response.data[index].from_contact_id === this.userObjectId){
-                                    console.log(`Me: ${response.data[index].message_txt}`)
-                                }else{
-                                    console.log(`Friend: ${response.data[index].message_txt}`)
-                                }
-                            }
 
-                        })
                 }
             })
 
@@ -86,10 +82,55 @@ export default {
 
     },
     methods: {
-        getUserId(index) {
+        getClickedUserId(index, friendId) {
+            let containerDiv = this.messagesContainer = document.getElementById("messages-box");
+            containerDiv.textContent = ''
+
             this.userActivateId = index
             this.userClicked = this.container[index].name
             this.onclickUser = true
+
+
+
+            this.api.getMsgHistoryFromAPI(this.userObjectId, friendId)
+                .then(response =>{
+                    for(let index in response.data){
+                        // console.log(`msg from data: ${response.data[index].message_txt}`)
+                        if (response.data[index].from_contact_id === this.userObjectId && response.data[index].to_contact_id === friendId){
+                            // console.log(`Me: ${response.data[index].message_txt}`)
+
+                            const receivedMessageDiv = document.createElement("div");
+                            receivedMessageDiv.className = "message-received-div";
+                            receivedMessageDiv.style.textAlign = "left";
+
+                            const receivedMessageText = document.createElement("p");
+                            receivedMessageText.className = "message-text";
+                            receivedMessageText.textContent = response.data[index].message_txt
+
+                            // Append the message text to the received message div
+                            receivedMessageDiv.appendChild(receivedMessageText);
+
+                            // Append the received message div to the messages container
+                            this.messagesContainer.appendChild(receivedMessageDiv);
+
+                        }else if(response.data[index].from_contact_id === friendId && response.data[index].to_contact_id === this.userObjectId){
+                            // console.log(`${friendId}: ${response.data[index].message_txt}`)
+
+                            const sentMessageDiv = document.createElement("div");
+                            sentMessageDiv.className = "message-sent";
+                            sentMessageDiv.style.textAlign = "left";
+
+                            const sentMessageText = document.createElement("p");
+                            sentMessageText.textContent = response.data[index].message_txt
+                            sentMessageDiv.appendChild(sentMessageText)
+                            containerDiv.appendChild(sentMessageDiv)
+                        }else {
+                            console.log(`No message`)
+                        }
+                    }
+
+                })
+
         },
         pushMessage() {
             const textarea = document.getElementById("text-box").value
