@@ -99,15 +99,13 @@ export default {
                 // messageBox.innerHTML +=textarea+"<br>"
                 // Create a new div element for the received message
                 const receivedMessageDiv = document.createElement("div");
-                receivedMessageDiv.className = "message received";
+                receivedMessageDiv.className = "message-received-div";
                 receivedMessageDiv.style.textAlign = "left";
-                // receivedMessageDiv.style.backgroundColor = "#eee";
-                receivedMessageDiv.style.marginLeft = "10px";
 
                 // Create a new p element for the message text
                 const receivedMessageText = document.createElement("p");
                 receivedMessageText.className = "message-text";
-                receivedMessageText.textContent = "This is a received message. \n message received";
+                receivedMessageText.textContent = "This is a received message. This is a received message \n message received";
 
                 // Append the message text to the received message div
                 receivedMessageDiv.appendChild(receivedMessageText);
@@ -117,15 +115,26 @@ export default {
 
                 // Create a new div element for the sent message
                 const sentMessageDiv = document.createElement("div");
-                sentMessageDiv.className = "message sent";
-                sentMessageDiv.style.textAlign = "right";
+                sentMessageDiv.className = "message-sent";
+                sentMessageDiv.style.textAlign = "left";
+                // sentMessageDiv.style.float = "right";
+                // sentMessageDiv.style.width = "100%";
+                // sentMessageDiv.style.marginRight = '10px'
+                // sentMessageDiv.style.marginBottom = '15px'
+
+
+                // sentMessageDiv.style.width = "200px";
                 // sentMessageDiv.style.backgroundColor = "#fff";
                 // sentMessageDiv.style.color = "";
-                sentMessageDiv.style.marginRight = "10px";
+                // sentMessageDiv.style.marginRight = "10px";
 
                 // Create a new p element for the message text and set text-area's value in p
-                const sentMessageText = document.createElement("span");
-                sentMessageText.className = "message-text";
+                const sentMessageText = document.createElement("p");
+                // sentMessageText.style.height= 'fit-content'
+                // sentMessageText.style.textAlign = 'right'
+                // sentMessageText.style.width = '200px'
+                // sentMessageText.style.overflowWrap = 'auto'
+                // sentMessageText.className = "message-text";
                 sentMessageText.textContent = textarea;
 
                 // Append the message text to the sent
@@ -133,7 +142,7 @@ export default {
                 this.messagesContainer.appendChild(sentMessageDiv)
 
                 //Keep scrollbar down after receiving message
-                thia.messagesContainer.scrollTop = this.messagesContainer.scrollHeight
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight
 
             }
             document.getElementById("text-box").value = ""
