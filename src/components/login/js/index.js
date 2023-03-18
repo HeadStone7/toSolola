@@ -1,5 +1,6 @@
 /* eslint-disable */
 import {ApiCall} from "../../../ApiCall";
+import {PahoMqtt} from '../../../PahoMqtt'
 export default {
     components: {},
     data() {
@@ -12,7 +13,9 @@ export default {
             api: null,
             showLogin: true,
             showRegister: false,
-            showLoading: false
+            showLoading: false,
+            mqttClient: null,
+            brokerUrl: 'mqtt://localhost:1883'
         }
     },
     watch:{
@@ -22,8 +25,29 @@ export default {
     },
     beforeMount() {
         this.api = new ApiCall()
+        this.mqttClient = new PahoMqtt({
+            hostname: 'localhost',
+            port: 9001,
+            clientId: 'ove4445ll',
+        })
+        setTimeout(()=>{
+            this.mqttClient.connectToBroker()
+        },6000)
+        setTimeout(()=>{
+            console.log('Subscribing now...')
+            this.mqttClient.subscribeToTopic('Test')
+        },7000)
+        console.log('publishing now..')
+        setTimeout(()=>{
+            this.mqttClient.publishToBroker('Test', 'This is Tosolola bien again')
+            console.log('published')
+        },7000)
     },
     mounted() {
+        // this.mqttClient.connectBroker('mqtt://localhost:1883')
+        // this.mqttClient.subscribe('msg', {qos: 1})
+        // this.mqttClient.publish('msg', 'This is message from chatJs on mounted', {qos: 1})
+
         this.registerPage = document.getElementById("registerPage");
         this.loginPage = document.getElementById("loginPage");
         this.loginTitleBtn = document.getElementById("loginState")
