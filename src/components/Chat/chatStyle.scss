@@ -12,10 +12,17 @@ body{
       width: 95vw;
       margin-left:6vw;
       background: #cccccc;
+      .no-select{
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
       .contacts{
         display: flex;
         flex-direction: column;
-        width: 40vw;
+        width: 241px;
         height: 100vh;
         background: #f1f0f0;
         border-right: 0.1vh solid #0000003f;
@@ -122,6 +129,17 @@ body{
                   width: 80%;
                   font-size: 1.5vw;
                   color: #b3b2b2;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+                .new-msg{
+                  display: flex;
+                  align-items: flex-end;
+                  height: 50%;
+                  width: 80%;
+                  font-size: 1.5vw;
+                  color: #227bb0;
                   overflow: hidden;
                   text-overflow: ellipsis;
                   white-space: nowrap;
