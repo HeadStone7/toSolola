@@ -188,5 +188,18 @@ export class ApiCall {
             console.log(`getMsgHistoryFromAPI error: ${error}`);
         }
     }
+    async saveMsgToDB(fromContactId, msg, toContactId){
+        try {
+            await axios.get(
+                'http://localhost:8080/tosolola/api/save-msg?fromContactId='+fromContactId+'&msg='+
+                msg+'&toContactId='+toContactId)
+                .catch(error =>{
+                    console.log(`saveMsgToDB error: ${error}`)
+                })
+            console.log('msg saved in DB')
+        }catch (e) {
+            console.log(`saveMsgToDB: ${e}`)
+        }
+    }
 
 }
