@@ -64,7 +64,7 @@ export default {
             this.myTopic = `${this.username}${this.userObjectId}`
             setTimeout(()=>{
                 this.mqttClient.connectToBroker()
-            },10000)
+            },9000)
 
             /**
              * Subscribe to my MQTT topic (username+userid)
@@ -135,7 +135,7 @@ export default {
                                         setTimeout(()=>{
                                             console.log(`topic: ${users[0].username}${users[0].user_id}`)
                                             this.mqttClient.subscribeToTopic(`${users[0].username}${users[0].user_id}`)
-                                        }, 10000)
+                                        }, 9000)
 
                                         /**
                                          * Fetch each friends data into user object to be displayed on
