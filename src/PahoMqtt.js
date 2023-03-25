@@ -2,13 +2,16 @@
 import Paho from 'paho-mqtt'
 
 export class PahoMqtt{
-    constructor(options) {
-        this.client = new Paho.Client(options.hostname, options.port, "ClientId")
+    constructor(clientId) {
+        this.client = new Paho.Client('localhost', 9001, clientId)
         this.client.onConnectionLost = this.onConnectionLost.bind(this)
         // this.client.onMessageArrived = this.onMessageArrived.bind(this)
-        this.client.qos = 1
+
     }
 
+    /**
+     * Function connects to the broker and response whether it's connected or connection failed
+     */
     connectToBroker(){
         setTimeout(() =>{
             this.client.connect({
@@ -17,8 +20,8 @@ export class PahoMqtt{
                 },
                 onFailure: (err) =>{
                     console.error('MQTT connection failed: ', err)
-                }
-
+                },
+                // keepalive: 60
             }, 3000)
         })
     }
@@ -28,7 +31,6 @@ export class PahoMqtt{
             invocationContext: { foo: true},
             onSuccess: this.onSuccessCallback,
             onFailure: this.onFailureCallback,
-            timeout: 20
         }
         this.client.subscribe(topic, subscribeOption)
     }
@@ -53,6 +55,10 @@ export class PahoMqtt{
 
     onConnectionLost(err){
         console.error('MQTT connection lost: ', err)
+        setTimeout(()=>{
+            console.log(`Reconnecting...`)
+            this.connectToBroker()
+        },500)
     }
 
     setMessageReceivedCallback(callback){
