@@ -10,14 +10,13 @@ export default {
       return {
           name: 'chatComponent',
           onclickUser: false,
-          showSearchedUser: false,
+          showSearchContainerFlag: '',
           messageContainer: null,
           newMessageArrived:false,
           msg:null,
-          msgTopic:null,
+          senderReceiverIdContainer:[],
           userObjectId: null,
           userActivateId: null,
-          receivedMsgTopicContainer: [],
           username:null,
           friendClickedId: null,
           imagePath: undefined,
@@ -41,69 +40,55 @@ export default {
     },
     mounted() {
         console.log('After mounted')
+        this.messagesContainer = document.getElementById("messages-box")
+        this.userObjectId = this.$store.state.user.userId
+        this.username = this.$store.state.user.username
         this.mqttConnection()
         this.getAcceptedFriendId()
+        this.pushMessage()
+        /**
+         * The following is displaying the received message in the container of contacts list
+         */
+        setTimeout(()=>{
+            this.mqttClient.setMessageReceivedCallback((senderId, recipientId, receivedMsg) => {
+                let senderRecipientId = {
+                    senderId: senderId,
+                    receiverId: recipientId
+                }
+                this.senderReceiverIdContainer.push(senderRecipientId)
+                this.msg = receivedMsg.payloadString
+                console.log(`Finally the received message is: ${this.msg} from: ${senderId} to: ${recipientId}`)
+                this.mqttUpdateReceivedMessage(senderId, recipientId, this.msg)
+                console.log(`Now pushing received message: ${this.msg}`)
+            })
+        },1000)
     },
     computed:{
+        searchContact() {
+            if(this.showSearchContainerFlag === '') return true
+            else return false;
+        }
     },
     methods: {
         /**
          * Function is connecting to mqtt broker
          */
         mqttConnection(){
-            const prefix = 'user-'
+            const prefix = this.username
             const randomId = Math.random().toString(36).substring(2, 9)
-            this.mqttClient = new PahoMqtt({
-                hostname: 'localhost',
-                port: 9001,
-                clientId: `${prefix}${randomId}`,
-            })
-            this.messagesContainer = document.getElementById("messages-box")
-            this.userObjectId = this.$store.state.user.userId
-            this.username = this.$store.state.user.username
+            this.mqttClient = new PahoMqtt(`${prefix}${randomId}`
+            )
             this.myTopic = `${this.username}${this.userObjectId}`
             setTimeout(()=>{
                 this.mqttClient.connectToBroker()
-            },9000)
-
-            /**
-             * Subscribe to my MQTT topic (username+userid)
-             */
-
-            setTimeout(()=>{
-                this.mqttClient.subscribeToTopic(this.myTopic)
-                console.log(`Topic:  ${this.username}${this.userObjectId}`)
-            }, 9000)
-            // setTimeout(()=>{
-            //     this.mqttClient.publishToBroker(this.myTopic, `${this.myTopic}: Hi Mqtt I love you`)
-            // },9000)
-
-            this.mqttClient.setMessageReceivedCallback((receivedMsg, topic) =>{
-                this.msg = receivedMsg
-                this.msgTopic = topic
-                console.log(`Finally the received message is: ${receivedMsg} and topic: ${topic}`)
-                this.receivedMsgTopicContainer.push(topic)
-                this.mqttUpdateReceivedMessage(receivedMsg, topic)
-                this.pushReceivedMsg()
-                for(let index in this.friendContainer){
-                    if(this.msgTopic === `${this.friendContainer[index].name}${this.friendContainer[index].userId}`){
-
-                        const receivedMessageDiv = document.createElement("div");
-                        const receivedMessageTextP = document.createElement("p");
-                        receivedMessageDiv.className = "message-received-div";
-                        receivedMessageDiv.style.textAlign = "left";
-                        receivedMessageTextP.className = "message-text";
-
-                        receivedMessageTextP.textContent = this.msg
-                        receivedMessageDiv.appendChild(receivedMessageTextP)
-                        setTimeout(()=>{
-                            this.messagesContainer.appendChild(receivedMessageDiv)
-
-                        },10)
-                    }
-
-                }
-            })
+                /**
+                 * Subscribe to my MQTT topic (username+userid)
+                 */
+                setTimeout(()=>{
+                    this.mqttClient.subscribeToTopic(`friends/chat`)
+                    console.log(`Connected to my Topic, subscribe: friends/chat`)
+                }, 1000)
+            },2000)
         },
 
         /**
@@ -123,20 +108,8 @@ export default {
 
                         this.api.getUserById(id.data[index].user_id)
                             .then(users =>{
-                                // console.log(`users : ${users[0].username}`)
-
                                 this.api.getImageFromAPI(id.data[index].user_id)
                                     .then(path =>{
-                                        console.log('this path: '+path)
-
-                                        /**
-                                         * Subscribe to each friend's MQTT topic
-                                         */
-                                        setTimeout(()=>{
-                                            console.log(`topic: ${users[0].username}${users[0].user_id}`)
-                                            this.mqttClient.subscribeToTopic(`${users[0].username}${users[0].user_id}`)
-                                        }, 9000)
-
                                         /**
                                          * Fetch each friends data into user object to be displayed on
                                          * user's friends container
@@ -149,12 +122,8 @@ export default {
                                             msg: '',
 
                                         }
-
                                         //push user in contact list container
                                         this.friendContainer.push(friend)
-
-                                        console.log('it\'s alright')
-
                                     })
 
                             })
@@ -164,26 +133,42 @@ export default {
                 })
         },
         pushReceivedMsg(){
+            for(let index in this.friendContainer){
+                for(let index in this.senderReceiverIdContainer){
+                    if(this.senderReceiverIdContainer[index].senderId === `${this.friendContainer[index].userId}`
+                        && `${this.senderReceiverIdContainer[index].receiverId === `${this.userObjectId}`}`){
+                        const receivedMessageDiv = document.createElement("div");
+                        const receivedMessageTextP = document.createElement("p");
+                        receivedMessageDiv.className = "message-received-div";
+                        receivedMessageDiv.style.textAlign = "left";
+                        receivedMessageTextP.className = "message-text";
 
+                        receivedMessageTextP.textContent = this.msg
+                        receivedMessageDiv.appendChild(receivedMessageTextP)
+                        setTimeout(()=>{
+                            this.messagesContainer.appendChild(receivedMessageDiv)
+                        },10)
+                        console.log(`Mqtt received msg pushed`)
+                    }
 
-
+                }
+            }
 
         },
         /**
          * First loop search in friendContainer array.
-         * Find the corresponding topic = username+userId of received message.
-         * Set msg to new received message
+         * Find the corresponding topic through the userId.
+         * Set msg in contact list to new received message
          */
-        mqttUpdateReceivedMessage(receivedMsg, topic){
-            console.log('mqttUpdateReceivedMessage is running')
-            for (let friend in this.friendContainer){
-                if(`${this.friendContainer[friend].name}${this.friendContainer[friend].userId}`=== topic){
-                    console.log(`${this.friendContainer[friend].name}${this.friendContainer[friend].userId} === ${topic}`)
-                    this.newMessageArrived = true
-                    this.friendContainer[friend].msg = receivedMsg
+        mqttUpdateReceivedMessage(senderId, receiverId, receivedMsg){
+                for (let friend in this.friendContainer) {
+                    if(`${this.friendContainer[friend].userId}` === `${senderId}`
+                        && `${this.userObjectId}` === `${receiverId}`){
+                        this.friendContainer[friend].msg = receivedMsg
+                        // this.newMessageArrived = true
+                        break
+                    }
                 }
-            }
-
         },
         /**
          * Function is used in ChatContactCompo file where the clicked friend's id and the key are taken
@@ -199,80 +184,79 @@ export default {
             this.userClicked = this.friendContainer[index].name
             this.onclickUser = true
 
-            /**
-             * Removing the received message topic of the clicked msg to change the color of msg from blue to black
-             */
-            for(let i in this.receivedMsgTopicContainer){
-                if(this.receivedMsgTopicContainer[i] === `${this.friendContainer[index].name}${friendId}`){
-                    this.receivedMsgTopicContainer.splice(i,1)
+            for(let index in this.senderReceiverIdContainer) {
+                if (`${this.senderReceiverIdContainer[index].senderId}` === `${this.friendClickedId}`
+                    && `${this.senderReceiverIdContainer[index].receiverId}` === `${this.userObjectId}`) {
+                    this.senderReceiverIdContainer.splice(index, 1)
+
                     setTimeout(()=>{
-                        this.friendContainer[index].msg = ''
+                        this.friendContainer[friendId].msg = ''
                     },1000)
                 }
             }
-
 
             /**
              * The API function is displaying saved history messages from DB to UI of
              * each friends
              */
-            // this.api.getMsgHistoryFromAPI(this.userObjectId, friendId)
-            //     .then(response =>{
-            //         for(let index in response.data){
-            //             // console.log(`msg from data: ${response.data[index].message_txt}`)
-            //             if (response.data[index].to_contact_id === this.userObjectId && response.data[index].from_contact_id === friendId){
-            //                 // console.log(`Me: ${response.data[index].message_txt}`)
-            //
-            //                 /**
-            //                  * THIS IS THE PROCESS OF APPENDING EACH RECEIVED MESSAGES FROM HISTORY TO UI
-            //                  * firstly create DIV (receivedMessageDIV)
-            //                  * secondly create a paragraph P (receivedMessageTextP)
-            //                  * thirdly set a className of receivedMessageDIV to "message-received-div"
-            //                  * and style it
-            //                  * fourthly set a className of receivedMessageTextP to "message-text"
-            //                  * fifthly set receivedMessageTextP content to the received message by
-            //                  * using appendChild
-            //                  * sixthly append Paragraph receivedMessageTextP to DIV receivedMessageDiv by
-            //                  * using appendChild
-            //                  */
-            //                 const receivedMessageDiv = document.createElement("div");
-            //                 const receivedMessageTextP = document.createElement("p");
-            //                 receivedMessageDiv.className = "message-received-div";
-            //                 receivedMessageDiv.style.textAlign = "left";
-            //                 receivedMessageTextP.className = "message-text";
-            //
-            //
-            //                 receivedMessageTextP.textContent = response.data[index].message_txt
-            //
-            //                 // Append the message text to the received message div
-            //                 receivedMessageDiv.appendChild(receivedMessageTextP);
-            //
-            //                 // Append the received message div to the messages container
-            //                 this.messagesContainer.appendChild(receivedMessageDiv);
-            //
-            //
-            //             }else if(response.data[index].to_contact_id === friendId && response.data[index].from_contact_id === this.userObjectId){
-            //                 // console.log(`${friendId}: ${response.data[index].message_txt}`)
-            //
-            //                 const sentMessageDiv = document.createElement("div");
-            //                 sentMessageDiv.className = "message-sent";
-            //                 sentMessageDiv.style.textAlign = "left";
-            //
-            //                 const sentMessageText = document.createElement("p");
-            //                 sentMessageText.textContent = response.data[index].message_txt
-            //                 sentMessageDiv.appendChild(sentMessageText)
-            //                 containerDiv.appendChild(sentMessageDiv)
-            //             }else {
-            //                 console.log(`No message`)
-            //             }
-            //         }
-            //
-            //     })
+            this.api.getMsgHistoryFromAPI(this.userObjectId, friendId)
+                .then(response =>{
+                    for(let index in response.data){
+                        // console.log(`msg from data: ${response.data[index].message_txt}`)
+                        if (response.data[index].to_contact_id === this.userObjectId && response.data[index].from_contact_id === friendId){
+                            // console.log(`Me: ${response.data[index].message_txt}`)
 
+                            /**
+                             * THIS IS THE PROCESS OF APPENDING EACH RECEIVED MESSAGES FROM HISTORY TO UI
+                             * firstly create DIV (receivedMessageDIV)
+                             * secondly create a paragraph P (receivedMessageTextP)
+                             * thirdly set a className of receivedMessageDIV to "message-received-div"
+                             * and style it
+                             * fourthly set a className of receivedMessageTextP to "message-text"
+                             * fifthly set receivedMessageTextP content to the received message by
+                             * using appendChild
+                             * sixthly append Paragraph receivedMessageTextP to DIV receivedMessageDiv by
+                             * using appendChild
+                             */
+                            const receivedMessageDiv = document.createElement("div");
+                            const receivedMessageTextP = document.createElement("p");
+                            receivedMessageDiv.className = "message-received-div";
+                            receivedMessageDiv.style.textAlign = "left";
+                            receivedMessageTextP.className = "message-text";
+
+
+                            receivedMessageTextP.textContent = response.data[index].message_txt
+
+                            // Append the message text to the received message div
+                            receivedMessageDiv.appendChild(receivedMessageTextP);
+
+                            // Append the received message div to the messages container
+                            this.messagesContainer.appendChild(receivedMessageDiv);
+
+
+                        }else if(response.data[index].to_contact_id === friendId && response.data[index].from_contact_id === this.userObjectId){
+                            // console.log(`${friendId}: ${response.data[index].message_txt}`)
+
+                            const sentMessageDiv = document.createElement("div");
+                            sentMessageDiv.className = "message-sent";
+                            sentMessageDiv.style.textAlign = "left";
+
+                            const sentMessageText = document.createElement("p");
+                            sentMessageText.textContent = response.data[index].message_txt
+                            sentMessageDiv.appendChild(sentMessageText)
+                            containerDiv.appendChild(sentMessageDiv)
+                        }else {
+                            console.log(`No message`)
+                        }
+                    }
+
+                })
+
+            this.pushReceivedMsg()
             //scroll to the bottom to see the last message
             setTimeout(()=>{
                 containerDiv.scrollTop = containerDiv.scrollHeight
-            },30)
+            },70)
 
         },
         pushMessage() {
@@ -333,26 +317,20 @@ export default {
                  * @param textareaContent => Text Message
                  * @param this.friendClickedId which is the friend who receives the message
                  */
-                // this.api.saveMsgToDB(this.userObjectId, textareaContent, this.friendClickedId)
-                console.log(`publish is not working topic =${this.userClicked}${this.friendClickedId} ---------------`)
+                this.api.saveMsgToDB(this.userObjectId, textareaContent, this.friendClickedId)
                 setTimeout(()=>{
-                    this.mqttClient.publishToBroker(`${this.userClicked}${this.friendClickedId}`, textareaContent)
-                    console.log(` Topic: ${this.userClicked}${this.friendClickedId} , message: ${textareaContent}`)
+                    this.mqttClient.publishToBroker(`${this.userObjectId}`, `${this.friendClickedId}`, textareaContent)
+                    console.log(` From ${this.userObjectId} to : ${this.friendClickedId} message: ${textareaContent}`)
                 },4000)
 
 
             }
-            // document.getElementById("text-box").value = ""
+            //Clear text-box
             setTimeout(()=>{
                 document.getElementById("text-box").value = ""
             },200)
-        },
-        searchContact:()=>{
-            let searchingString = document.getElementById('searchField').value
-            if(searchingString !== ''){
 
-            }
-        }
+        },
     }
 }
 

@@ -14,34 +14,20 @@ export default {
             showLogin: true,
             showRegister: false,
             showLoading: false,
-            mqttClient: null,
-            brokerUrl: 'mqtt://localhost:1883'
         }
     },
     watch:{
+        /**
+         * Checking if there's connection and load, if not stop loading
+         * @param newVal
+         * @param oldVal
+         */
         showLoading(newVal, oldVal){
             oldVal = this.$store.state.networkStatus.state
         }
     },
     beforeMount() {
         this.api = new ApiCall()
-        this.mqttClient = new PahoMqtt({
-            hostname: 'localhost',
-            port: 9001,
-            clientId: 'ove4445ll',
-        })
-        setTimeout(()=>{
-            this.mqttClient.connectToBroker()
-        },6000)
-        setTimeout(()=>{
-            console.log('Subscribing now...')
-            this.mqttClient.subscribeToTopic('Test')
-        },7000)
-        console.log('publishing now..')
-        setTimeout(()=>{
-            this.mqttClient.publishToBroker('Test', 'This is Tosolola bien again')
-            console.log('published')
-        },7000)
     },
     mounted() {
         // this.mqttClient.connectBroker('mqtt://localhost:1883')
