@@ -38,11 +38,16 @@ export class PahoMqtt{
     unsubscribeToBroker(topic){
         this.client.unsubscribe(topic)
     }
-    publishToBroker(topic, payload){
-        const message = new Paho.Message(payload);
-        message.destinationName = topic;
+    publishToBroker(myId,recipientId, msg){
+        const message = new Paho.Message(msg)
         message.retained = false
-        this.client.send(message)
+        const payload = {
+            from: myId,
+            to: recipientId,
+            msg: message
+        };
+
+        this.client.send(`friends/chat`, JSON.stringify(payload), 1)
 
         // this.client.onMessageArrived = function (message) {
         //     console.log(`Message Arrived: ${message.payloadString}`);
@@ -64,10 +69,13 @@ export class PahoMqtt{
     setMessageReceivedCallback(callback){
         // console.log('MQTT message received: ', message.payloadString)
         this.client.onMessageArrived = (message) =>{
-            const receivedMsg = message.payloadString;
-            const msgTopic = message.destinationName
-            callback(receivedMsg, msgTopic)
+            const payload = JSON.parse(message.payloadString)
+            const receivedMsg = payload.msg
+            const senderId = payload.from
+            const recipientId = payload.to
+            callback(senderId, recipientId, receivedMsg)
         }
+
     }
 
     onSuccessCallback(){
