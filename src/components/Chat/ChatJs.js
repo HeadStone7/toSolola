@@ -12,7 +12,6 @@ export default {
           onclickUser: false,
           showSearchContainerFlag: '',
           messageContainer: null,
-          newMessageArrived:false,
           msg:null,
           senderReceiverIdContainer:[],
           userObjectId: null,
@@ -120,7 +119,7 @@ export default {
                                             picture: path,
                                             name: users[0].username,
                                             msg: '',
-
+                                            highlightFlag:false
                                         }
                                         //push user in contact list container
                                         this.friendContainer.push(friend)
@@ -165,7 +164,7 @@ export default {
                     if(`${this.friendContainer[friend].userId}` === `${senderId}`
                         && `${this.userObjectId}` === `${receiverId}`){
                         this.friendContainer[friend].msg = receivedMsg
-                        // this.newMessageArrived = true
+                        this.friendContainer[friend].highlightFlag = true
                         break
                     }
                 }
@@ -188,13 +187,14 @@ export default {
                 if (`${this.senderReceiverIdContainer[index].senderId}` === `${this.friendClickedId}`
                     && `${this.senderReceiverIdContainer[index].receiverId}` === `${this.userObjectId}`) {
                     this.senderReceiverIdContainer.splice(index, 1)
+                    for(let index in this.friendContainer){
+                        if(`${this.friendContainer[index].userId}` === `${this.friendClickedId}`){
+                            this.friendContainer[index].highlightFlag = false
+                        }
+                    }
 
-                    setTimeout(()=>{
-                        this.friendContainer[friendId].msg = ''
-                    },1000)
                 }
             }
-
             /**
              * The API function is displaying saved history messages from DB to UI of
              * each friends
