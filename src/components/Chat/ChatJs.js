@@ -10,7 +10,6 @@ export default {
       return {
           name: 'chatComponent',
           onclickUser: false,
-          showSearchContainerFlag: '',
           msg: null,
           senderReceiverIdContainer:[],
           userObjectId: null,
@@ -56,12 +55,22 @@ export default {
         },1000)
     },
     computed:{
-        searchContact() {
-            if(this.showSearchContainerFlag === '') return true
-            else return false;
-        }
+
     },
     methods: {
+        searchContact() {
+            let input = document.getElementById("searchField").value
+            input = input.toLowerCase();
+            let x = document.getElementsByClassName("contact");
+
+            for(let i = 0; i < x.length; i++){
+                if(!x[i].innerHTML.toLowerCase().includes(input)){
+                    x[i].style.display = "none";
+                }else{
+                    x[i].style.display = "flex"
+                }
+            }
+        },
         /**
          * Function is connecting to mqtt broker
          */
@@ -123,32 +132,32 @@ export default {
                     }
                 })
         },
-        pushReceivedMsg(){
-            for(let index in this.friendContainer){
-                for(let index2 in this.senderReceiverIdContainer){
-                    if(this.senderReceiverIdContainer[index2].senderId === `${this.friendContainer[index].userId}`
-                        && `${this.senderReceiverIdContainer[index2].receiverId === `${this.userObjectId}`}`){
-                        const receivedMessageDiv = document.createElement("div");
-                        const receivedMessageTextP = document.createElement("p");
-                        receivedMessageDiv.className = "message-received-div";
-                        receivedMessageDiv.style.textAlign = "left";
-                        receivedMessageTextP.className = "message-text";
-
-                        receivedMessageTextP.textContent = this.msg
-                        receivedMessageDiv.appendChild(receivedMessageTextP)
-                        setTimeout(()=>{
-                            this.messagesContainer.appendChild(receivedMessageDiv)
-                        },10)
-                        console.log(`Mqtt received msg pushed`)
-
-                    }else{
-                        console.log('Not concerning you please')
-                    }
-
-                }
-            }
-
-        },
+        // pushReceivedMsg(){
+        //     for(let index in this.friendContainer){
+        //         for(let index2 in this.senderReceiverIdContainer){
+        //             if(this.senderReceiverIdContainer[index2].senderId === `${this.friendContainer[index].userId}`
+        //                 && `${this.senderReceiverIdContainer[index2].receiverId === `${this.userObjectId}`}`){
+        //                 const receivedMessageDiv = document.createElement("div");
+        //                 const receivedMessageTextP = document.createElement("p");
+        //                 receivedMessageDiv.className = "message-received-div";
+        //                 receivedMessageDiv.style.textAlign = "left";
+        //                 receivedMessageTextP.className = "message-text";
+        //
+        //                 receivedMessageTextP.textContent = this.msg
+        //                 receivedMessageDiv.appendChild(receivedMessageTextP)
+        //                 setTimeout(()=>{
+        //                     this.messagesContainer.appendChild(receivedMessageDiv)
+        //                 },10)
+        //                 console.log(`Mqtt received msg pushed`)
+        //
+        //             }else{
+        //                 console.log('Not concerning you please')
+        //             }
+        //
+        //         }
+        //     }
+        //
+        // },
         /**
          * First loop search in friendContainer array.
          * Find the corresponding topic through the userId.
