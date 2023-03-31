@@ -11,8 +11,7 @@ export default {
           name: 'chatComponent',
           onclickUser: false,
           showSearchContainerFlag: '',
-          messageContainer: null,
-          msg:null,
+          msg: null,
           senderReceiverIdContainer:[],
           userObjectId: null,
           userActivateId: null,
@@ -21,16 +20,9 @@ export default {
           imagePath: undefined,
           api: null,
           mqttClient: null,
-          myTopic:null,
-          user: {
-              picture: 'Pic',
-              name: 'Josh',
-              msg: 'demain je serai la',
-              date: '2020-04-12'
-          },
-          userActivedId: '',
           userClicked: '',
-          friendContainer: []
+          friendContainer: [],
+          smsAudio: null
       }
     },
     beforeMount() {
@@ -39,6 +31,7 @@ export default {
     },
     mounted() {
         console.log('After mounted')
+        this.smsAudio = new Audio(process.env.BASE_URL+'smsNotification.mp3')
         this.messagesContainer = document.getElementById("messages-box")
         this.userObjectId = this.$store.state.user.userId
         this.username = this.$store.state.user.username
@@ -77,7 +70,6 @@ export default {
             const randomId = Math.random().toString(36).substring(2, 9)
             this.mqttClient = new PahoMqtt(`${prefix}${randomId}`
             )
-            this.myTopic = `${this.username}${this.userObjectId}`
             setTimeout(()=>{
                 this.mqttClient.connectToBroker()
                 /**
@@ -133,9 +125,9 @@ export default {
         },
         pushReceivedMsg(){
             for(let index in this.friendContainer){
-                for(let index in this.senderReceiverIdContainer){
-                    if(this.senderReceiverIdContainer[index].senderId === `${this.friendContainer[index].userId}`
-                        && `${this.senderReceiverIdContainer[index].receiverId === `${this.userObjectId}`}`){
+                for(let index2 in this.senderReceiverIdContainer){
+                    if(this.senderReceiverIdContainer[index2].senderId === `${this.friendContainer[index].userId}`
+                        && `${this.senderReceiverIdContainer[index2].receiverId === `${this.userObjectId}`}`){
                         const receivedMessageDiv = document.createElement("div");
                         const receivedMessageTextP = document.createElement("p");
                         receivedMessageDiv.className = "message-received-div";
@@ -148,6 +140,9 @@ export default {
                             this.messagesContainer.appendChild(receivedMessageDiv)
                         },10)
                         console.log(`Mqtt received msg pushed`)
+
+                    }else{
+                        console.log('Not concerning you please')
                     }
 
                 }
@@ -165,9 +160,25 @@ export default {
                         && `${this.userObjectId}` === `${receiverId}`){
                         this.friendContainer[friend].msg = receivedMsg
                         this.friendContainer[friend].highlightFlag = true
+
+                        /**
+                         * Click the current clicked friend to see the new message when it arrives
+                         */
+                        if(`${this.friendClickedId}` === `${senderId}`){
+                            setTimeout(()=>{
+                                document.getElementById(`${this.friendClickedId}`).click()
+                            },200)
+                        }else{
+                            this.smsAudio.play()
+                                .catch(error =>{
+                                    console.log(`Notification ringtone error: ${error}`)
+                                })
+                        }
+
                         break
                     }
                 }
+
         },
         /**
          * Function is used in ChatContactCompo file where the clicked friend's id and the key are taken
@@ -183,6 +194,11 @@ export default {
             this.userClicked = this.friendContainer[index].name
             this.onclickUser = true
 
+            /**
+             * Checking if the clicked friend received a new msg, by checking its id in the received new msg container.
+             * If it's found, onclick the id is removed from the container and the msg color change to black
+             * by setting highlight to False
+             */
             for(let index in this.senderReceiverIdContainer) {
                 if (`${this.senderReceiverIdContainer[index].senderId}` === `${this.friendClickedId}`
                     && `${this.senderReceiverIdContainer[index].receiverId}` === `${this.userObjectId}`) {
@@ -252,11 +268,12 @@ export default {
 
                 })
 
-            this.pushReceivedMsg()
             //scroll to the bottom to see the last message
             setTimeout(()=>{
-                containerDiv.scrollTop = containerDiv.scrollHeight
-            },70)
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight
+            },25)
+            // this.pushReceivedMsg()
+
 
         },
         pushMessage() {
@@ -323,12 +340,17 @@ export default {
                     console.log(` From ${this.userObjectId} to : ${this.friendClickedId} message: ${textareaContent}`)
                 },4000)
 
+                //Scroll down to see the recent sent message
+                setTimeout(()=>{
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight
+                },300)
 
             }
             //Clear text-box
             setTimeout(()=>{
                 document.getElementById("text-box").value = ""
             },200)
+
 
         },
     }
