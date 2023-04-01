@@ -7,21 +7,18 @@ import store from "./store";
  */
 export class ApiCall {
 
-    async getUsers(){
-        let resp = await axios
-            .get('http://localhost:8080/test')
-            .catch(err => console.log("Error: ",err));
-        // eslint-disable-next-line
-        for(let index in resp.data){
-            console.log(resp.data[index].username+";"+resp.data[index].contact_id)
-
-        }
-
-        console.log(resp.data)
-
-        return resp.data
+    async checkFriendshipStatus(username, userId){
+        const response = await axios.get(`http://localhost:8080/tosolola/api/check-status?username=${username}&userId=${userId}`)
+            .catch(error =>{
+                console.error(`checkFriendshipStatus: ${error}`)
+            })
+        return response
     }
 
+    /**
+     * Return all registered users
+     * @returns {Promise<any>}
+     */
     async getAllUsers(){
         const response = await axios.get('http://localhost:8080/tosolola/api/users')
             .catch(error =>{
@@ -33,7 +30,7 @@ export class ApiCall {
     }
 
     /**
-     * Function Checks credential when login
+     * Function Checks credential when login,
      * also used to check before registering
      * @param phone
      * @param password

@@ -21,7 +21,8 @@ export default {
           mqttClient: null,
           userClicked: '',
           friendContainer: [],
-          smsAudio: null
+          smsAudio: null,
+          addFriendFlag: false
       }
     },
     beforeMount() {
@@ -58,18 +59,74 @@ export default {
 
     },
     methods: {
-        searchContact() {
-            let input = document.getElementById("searchField").value
-            input = input.toLowerCase();
+        //Switch between add and search friend
+        switchAddSearchFriend(){
             let x = document.getElementsByClassName("contact");
+              if(this.addFriendFlag === true){
+                  setTimeout(()=>{
+                      for (let i = 0; i < x.length; i++) {
+                          x[i].style.display = "flex"
+                      }
+                  }, 400)
+                  this.addFriendFlag = false
+              }else{
+                  for(let i = 0; i < x.length; i++){
+                      x[i].style.display = "none"
+                  }
+                  this.addFriendFlag = true
+              }
+        },
+        addFriend(){
+            let x = document.getElementsByClassName("contact");
+            if(this.addFriendFlag === true){
+                let input = document.getElementById("addFriend").value
+                input = input.toLowerCase()
+                this.api.getAllUsers()
+                    .then(users =>{
+                        for(let index in users){
+                           if(`${users[index].username.toLowerCase()}` === input){
+                               console.log(`inside the scoop`)
+                               setTimeout(()=>{
+                               this.api.checkFriendshipStatus(input, this.userObjectId)
+                                       .then(friends =>{
+                                           if(friends.data.length !== 0) {
+                                               for (let index in friends.data) {
+                                                   if (friends.data[index].status === 'accepted') {
+                                                       console.log(`accepted`)
+                                                       for(let i = 0; i < x.length; i++){
+                                                           if(x[i].innerHTML.toLowerCase().includes(input)){
+                                                               x[i].style.display = "flex"
+                                                           }
+                                                       }
+                                                   } else {
+                                                       console.log(`pending`)
+                                                   }
+                                               }
+                                           }else{
+                                               console.log(`Not it friendship table`)
+                                           }
+                                       })
+                               },100)
+                               break;
+                           }else{
+                               console.log(`not in users`)
+                           }
+                        }
+                    })
+            }else{
+                //Searching in contact list
+                let input = document.getElementById("searchField").value
+                input = input.toLowerCase();
 
-            for(let i = 0; i < x.length; i++){
-                if(!x[i].innerHTML.toLowerCase().includes(input)){
-                    x[i].style.display = "none";
-                }else{
-                    x[i].style.display = "flex"
+                for(let i = 0; i < x.length; i++){
+                    if(!x[i].innerHTML.toLowerCase().includes(input)){
+                        x[i].style.display = "none";
+                    }else{
+                        x[i].style.display = "flex"
+                    }
                 }
             }
+
         },
         /**
          * Function is connecting to mqtt broker
@@ -120,6 +177,7 @@ export default {
                                             picture: path,
                                             name: users[0].username,
                                             msg: '',
+                                            phone: users[0].phone,
                                             highlightFlag:false
                                         }
                                         //push user in contact list container
@@ -202,6 +260,8 @@ export default {
             this.userActivateId = index
             this.userClicked = this.friendContainer[index].name
             this.onclickUser = true
+            let input = document.getElementById("addFriend")
+            input.value = ''
 
             /**
              * Checking if the clicked friend received a new msg, by checking its id in the received new msg container.
