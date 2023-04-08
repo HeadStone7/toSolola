@@ -7,12 +7,48 @@ import store from "./store";
  */
 export class ApiCall {
 
+    /**
+     * Accept or Cancel Friendship
+     * @param answer, true or false
+     * @param username the user who sent the request
+     * @param myUserId my userId
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
+    async acceptOrCancelFriendRequest(answer, username, myUserId){
+        let response = await axios.post(`http://localhost:8080/tosolola/api/accept-or-cancel-request`,{
+            answer: answer,
+            username: username,
+            myUserId: myUserId
+        })
+            .catch(error =>{
+            console.log(`acceptOrCancelFriendRequest : ${error}`)
+        })
+        return response;
+
+    }
+
+    /**
+     * check friendship status
+     * @param username
+     * @param userId
+     * @returns {Promise<axios.AxiosResponse<any>>}
+     */
     async checkFriendshipStatus(username, userId){
         const response = await axios.get(`http://localhost:8080/tosolola/api/check-status?username=${username}&userId=${userId}`)
             .catch(error =>{
                 console.error(`checkFriendshipStatus: ${error}`)
             })
         return response
+    }
+    async setFriendRequestAPI(newFriendId, myUserId){
+        let response = await axios.post(`http://localhost:8080/tosolola/api/set-friend-request`, {
+            newFriendId: newFriendId,
+            myUserId: myUserId
+        })
+            .catch(error => {
+                console.log(`SetFriendRequest: ${error}`)
+            })
+        return response;
     }
 
     /**
