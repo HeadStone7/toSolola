@@ -2,7 +2,7 @@
 
 ## Project setup
 ```
-npm install
+npm install OR npx cross-env ELECTRON_GET_USE_PROXY=true GLOBAL_AGENT_HTTPS_PROXY=$https_proxy npm install
 ```
 
 ### Compiles and hot-reloads for development (Run the app)
