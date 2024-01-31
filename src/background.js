@@ -13,23 +13,7 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 
-let loginWindow;
 let mainWindow;
-async function createLoginWindow(){
-  loginWindow = new BrowserWindow({
-    width: 400,
-    height: 650,
-    resizable: false
-
-  });
-  // Load the index.html when not in development
-  loginWindow.loadURL(`file://${__dirname}/../src/login/index.html`);
-  loginWindow.webContents.openDevTools()
-  loginWindow.setMenuBarVisibility(false)
-  loginWindow.on('closed', ()=>{
-      loginWindow = null
-  })
-}
 async function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -75,7 +59,6 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0)
-    createLoginWindow()
     createWindow()
 })
 //
@@ -91,11 +74,8 @@ app.on('ready', async () => {
   //     console.error('Vue Devtools failed to install:', e.toString())
   //   }
   // }
-  createLoginWindow();
-  loginWindow.on('closed', ()=>{
-    createWindow()
-    mainWindow.show();
-  })
+  createWindow()
+  mainWindow.show()
 
 })
 

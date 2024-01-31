@@ -1,2 +1,4 @@
 node_modules
 /package-lock.json
+/dist_electron/index.js
+/dist_electron/preload.js

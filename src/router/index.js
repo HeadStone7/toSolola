@@ -1,11 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import tabNav from '../views/LeftNav/LeftNavVue.vue'
+import contact from "../views/contacts/contact.vue";
+import tabNavView from '../views/LeftNav/LeftNavVue.vue'
 import profile from '../views/Profile/userProfile.vue'
 const routes = [
   {
     path: '/',
     name: 'LeftNav',
-    component: tabNav,
+    component: tabNavView,
     children: [
       {
         path: 'profile',
@@ -14,7 +15,8 @@ const routes = [
       },
       {
         path: 'contacts',
-        name: 'contacts'
+        name: 'contact',
+        component: contact
       }
     ]
   }

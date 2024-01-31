@@ -1,4 +1,4 @@
-
+$standardFontSize: 16px;
 body{
     padding: 0;
     margin-left:0vw;
@@ -12,10 +12,17 @@ body{
       width: 95vw;
       margin-left:6vw;
       background: #cccccc;
+      .no-select{
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
       .contacts{
         display: flex;
         flex-direction: column;
-        width: 40vw;
+        width: 241px;
         height: 100vh;
         background: #f1f0f0;
         border-right: 0.1vh solid #0000003f;
@@ -28,11 +35,23 @@ body{
           background: #FFFFFF;
           height: 5vw;
           padding-bottom: 2vw;
-          input{
-            width:19vw;
+          padding-left: 5px;
+            input[type=text]{
+              width: 19vw;
+              height: 2.5vw;
+              background: #ccc;
+              font-size: $standardFontSize;
+              border: none;
+              text-align: center;
+            }
+
+          input:focus {
+            width: 19vw;
             height: 2.5vw;
             background: #ccc;
-            border:none;
+            font-size: $standardFontSize;
+            outline: none;
+            border: none;
           }
           svg{
               cursor: pointer; 
@@ -42,14 +61,27 @@ body{
               margin: -0.5%;
           }
         }
+        .contact-list::-webkit-scrollbar{
+          cursor: pointer;
+          width: 0.5em;
+        }
+        .contact-list::-webkit-scrollbar-track{
+          box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+        .contact-list::-webkit-scrollbar-thumb {
+          background-color: darkgrey;
+          outline: 1px solid slategrey;
+          border-radius: 2rem;
+        }
         .contact-list{
           display: flex;
           flex-direction: column;
           overflow-y: auto ;
+          overflow-x: hidden ;
           width: 100%;
           height: 100vh;
           background: #f1f0f0;     
-  
+
           .contact{
               display: flex;
               flex-direction: row;
@@ -61,8 +93,8 @@ body{
   
               .picture{
                 background: #0e374f;
-                width: 30%;
                 height: 100%;
+                width: 20%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -72,10 +104,9 @@ body{
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: space-between;
-                
                 padding: 0.5vw;
-                width: 65%;
-  
+                width: 75%;
+
                 .name-and-date{
                   display: flex;
                   align-items: flex-end;
@@ -96,8 +127,23 @@ body{
                   display: flex;
                   align-items: flex-end;
                   height: 50%;
+                  width: 80%;
                   font-size: 1.5vw;
                   color: #b3b2b2;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+                .new-msg{
+                  display: flex;
+                  align-items: flex-end;
+                  height: 50%;
+                  width: 80%;
+                  font-size: 1.5vw;
+                  color: #227bb0;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
               }
             
@@ -112,7 +158,7 @@ body{
   
               .picture{
                 background: #00a2ff;
-                width: 30%;
+                width: 20%;
                 height: 100%;
                 display: flex;
                 align-items: center;
@@ -125,7 +171,7 @@ body{
                 justify-content: space-between;
                 
                 padding: 0.5vw;
-                width: 65%;
+                width: 75%;
   
                 .name-and-date{
                   display: flex;
@@ -147,13 +193,105 @@ body{
                   display: flex;
                   align-items: flex-end;
                   height: 50%;
+                  width: 80%;
                   font-size: 1.5vw;
-                  color: #b3b2b2;
+                  color: #000000;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
               }
             
             }  
             
+        }
+        .contact-list.addFriend{
+          display: flex;
+          flex-direction: column;
+          overflow-y: auto ;
+          overflow-x: hidden ;
+          width: 100%;
+          height: 100vh;
+          background: #f1f0f0;
+
+          .add{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            background: #f2f0f0;
+            width: 100%;
+            height: 7vw;
+
+
+            .picture{
+              background: #0e374f;
+              height: 100%;
+              width: 20%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .text{
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              justify-content: space-between;
+              padding: 0.5vw;
+              width: 75%;
+
+              .name-and-date{
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                width: 100%;
+                height: 50%;
+                .name{
+                  margin-bottom: -1.5%;
+                  font-size: 2vw;
+                }
+                .btn{
+                  display: flex;
+                  gap:17px;
+                  font-size: 1.5vw;
+                  color: #b3b2b2;
+                  .click{
+                    text-align: center;
+                    cursor: pointer;
+                    line-height: 1.7;
+                    color: #fff;
+                    height: 2vw;
+                    width: 5vw;
+                    background: #227bb0;
+                    font-size: 11px;
+                  }
+                  .no{
+                    background: #3a99d0;
+
+                  }
+                  .addBtn{
+                    background: #3a99d0;
+
+                  }
+
+                }
+
+              }
+              .msg{
+                display: none;
+                align-items: flex-end;
+                height: 50%;
+                width: 80%;
+                font-size: 1.5vw;
+                color: #227bb0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+              }
+            }
+
+          }
+
         }
       }
       .chat-box{
@@ -171,7 +309,7 @@ body{
           padding-left: 1vw;
           border-bottom: 0.1vh solid #0000003f ;
           .name{
-            font-size: 3vw;
+            font-size: 2vw;
           }
           svg{
             cursor: pointer;
@@ -179,16 +317,125 @@ body{
             width:3vw
           }
         }
-        #messages-box{
+        #messages-box {
           background: #f9f8f8;
+          padding: 2px 2px 2px 2px;
           overflow-y: auto;
+          overflow-x: hidden;
           width: 100%;
-          height: 65%;
+          height: 64%;
           word-break: break-word;
+
+          .message-received-div {
+            position: relative;
+            margin-left: 15px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left;
+            font: 400 .9em 'Open Sans', sans-serif;
+            border-radius: 10px;
+            border: 1px solid #d0cfcf;
+            width: 200px;
+            padding: 5px;
+            background: #d0cfcf;
+
+            span {
+              position: relative;
+              padding: 10px;
+              margin-bottom: 10px;
+              font: 400 .9em 'Open Sans', sans-serif;
+              border-radius: 10px;
+              border: 1px solid #d0cfcf;
+              padding: 5px;
+              background: #d0cfcf;
+              width: 200px;
+            }
+            span:after{
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 0;
+              border-top: 15px solid #d0cfcf;
+              border-right: 15px solid transparent;
+              border-left: 15px solid transparent;
+              top: -1px;
+              right: -15px;
+            }
+            p:after{
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 0;
+              border-top: 15px solid #d0cfcf;
+              border-left: 15px solid transparent;
+              border-right: 15px solid transparent;
+              top: -1px;
+              left: -15px;
+            }
+
+          }
+
+          .message-sent {
+            position: relative;
+            margin: 20px 0px 4px 400px;
+            padding: 5px;
+            text-align: right;
+            font: 400 .9em 'Open Sans', sans-serif;
+            border-radius: 10px;
+            border: 1px solid #d0cfcf;
+            width: 200px;
+            background: #aaa7a7;
+
+            span {
+              position: relative;
+              padding: 2px;
+              margin-bottom: 10px;
+              font: 400 .9em 'Open Sans', sans-serif;
+              border-radius: 10px;
+              border: 1px solid #d0cfcf;
+              background: #d0cfcf;
+              width: 200px;
+
+            }
+            span:after{
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 0;
+              border-top: 15px solid #d0cfcf;
+              border-right: 15px solid transparent;
+              border-left: 15px solid transparent;
+              top: -1px;
+              right: -15px;
+            }
+            p:after{
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 0;
+              border-top: 15px solid #aaa7a7;
+              border-left: 15px solid transparent;
+              border-right: 15px solid transparent;
+              top: -0.4px;
+              left: 195px;
+            }
+          }
+        }
+        #messages-box::-webkit-scrollbar{
+          cursor: pointer;
+          width: 0.5em;
+        }
+        #messages-box::-webkit-scrollbar-track{
+          box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+        #messages-box::-webkit-scrollbar-thumb {
+          background-color: darkgrey;
+          outline: 1px solid slategrey;
+          border-radius: 2rem;
         }
         .type-box{
           width: 100%;
-          height: 25.5%;
+          height: 22.5%;
       
           .type-tools{
             padding:1vw;
@@ -224,12 +471,39 @@ body{
             }
           }
           textarea{
+            font-size: $standardFontSize;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 14px;
             width: 100%;
-            height: 30%;
+            height: 41%;
+            resize: none;
+            outline: none;
+            border: none;
+            color: #000000;
+            font-weight: 500;
+            border-top: 1px solid #000000;
+          }
+          textarea::-webkit-scrollbar{
+            cursor: pointer;
+            width: 0.5em;
+          }
+          textarea::-webkit-scrollbar-track{
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+          }
+          textarea::-webkit-scrollbar-thumb {
+            cursor: pointer;
+            background-color: darkgrey;
+            outline: 1px solid slategrey;
+            border-radius: 2rem;
+          }
+          textarea:focus{
+            outline: none;
+            color: #000000;
+            border: none;
+            border-top: 1px solid #000000;
           }
           .sendBtn{
-            cursor: pointer;
-            background: #f2f0f0;
+            //background: #f2f0f0;
             width: 100%;
             height: 27.5%;
             display: flex;
@@ -239,7 +513,7 @@ body{
   
             #sendBtn{
               margin: auto;
-              background: #b7b4b4e8;
+              background: #e0dede;
               font-size: 2vw;
               color:#00a2ff;
               text-align: center;
@@ -248,6 +522,7 @@ body{
               height: 3vw; 
               margin-right: 2vw;
               padding-top: 1vw;
+              cursor: pointer;
             }
           }
         }
